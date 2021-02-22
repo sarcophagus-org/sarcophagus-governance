@@ -1,0 +1,7 @@
+{
+  "name": "Sarcophagus Dao",
+  "supportRequiredPct": 50,
+  "minAcceptQuorumPct": 10,
+  "voteTimeDays": 7,
+  "sarcoVotingRights": ""
+}

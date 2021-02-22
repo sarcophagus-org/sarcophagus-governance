@@ -1,0 +1,23 @@
+# Dependencies
+node_modules
+
+# lerna
+lerna-debug.log
+
+# lock files
+yarn.lock
+
+# truffle build artifacts
+abi
+build
+*/abis.json
+flattened_contracts
+
+# aragon
+./.aragon
+mainnet_key.json
+
+# truffle key
+privatekey.js
+
+.vscode

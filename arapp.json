@@ -1,0 +1,30 @@
+{
+  "environments": {
+    "default": {
+      "appName": "sarcophagus-dao-template.aragonpm.eth",
+      "network": "rpc",
+      "registry": "0x5f6f7e8cc7346a11ca2def8f827b7a0b612c56a1"
+    },
+    "mainnet": {
+      "appName": "sarcophagus-dao-template.open.aragonpm.eth",
+      "network": "mainnet",
+      "registry": "0x00000000000C2E074eC69A0dFb2997BA6C7d2e1e",
+      "wsRPC": "wss://mainnet.eth.aragon.network/ws"
+    },
+    "rinkeby": {
+      "appName": "sarcophagus-dao-template.open.aragonpm.eth",
+      "network": "rinkeby",
+      "registry": "0x98Df287B6C145399Aaa709692c8D308357bC085D",
+      "wsRPC": "wss://rinkeby.eth.aragon.network/ws",
+      "address": "0x8249aca768d971a6f1fccdb29f0cf3dde1f68dd4"
+    },
+    "ropsten": {
+      "appName": "sarcophagus-dao-template.open.aragonpm.eth",
+      "network": "ropsten",
+      "registry": "0x6afe2cacee211ea9179992f89dc61ff25c61e923",
+      "wsRPC": "wss://ropsten.eth.aragon.network/ws"
+    }
+  },
+  "roles": [],
+  "path": "contracts/SarcophagusDaoTemplate.sol"
+}
