@@ -16,7 +16,7 @@
       "network": "rinkeby",
       "registry": "0x98Df287B6C145399Aaa709692c8D308357bC085D",
       "wsRPC": "wss://rinkeby.eth.aragon.network/ws",
-      "address": "0x8249aca768d971a6f1fccdb29f0cf3dde1f68dd4"
+      "address": "0x4082252b3e96ebc14159a45283f47143ff350ab9"
     },
     "ropsten": {
       "appName": "sarcophagus-dao-template.open.aragonpm.eth",
