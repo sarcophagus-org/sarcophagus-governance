@@ -33,7 +33,6 @@ const sarcophagusDaoTemplateAddress = () => {
 
 module.exports = async (callback) => {
   try {
-    const accounts = web3.currentProvider.addresses
     const config = require(daoConfig());
     let sarcoVotingRightsAddr;
 
@@ -57,8 +56,7 @@ module.exports = async (callback) => {
         config.supportRequiredPct * 1e16,
         config.minAcceptQuorumPct * 1e16,
         time.duration.days(config.voteTimeDays).toNumber()
-      ],
-      accounts[0]
+      ]
     )
 
     const dao = getEventArgument(receipt, 'DeployDao', 'dao')

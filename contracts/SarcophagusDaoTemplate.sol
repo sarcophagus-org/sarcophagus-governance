@@ -7,6 +7,7 @@ contract SarcophagusDaoTemplate is BaseTemplate {
         "SARCOPHAGUS_DAO_BAD_VOTE_SETTINGS";
 
     address private constant ANY_ENTITY = address(-1);
+    uint64 private constant DEFAULT_FINANCE_PERIOD = uint64(30 days);
 
     event SarcophagusDaoDeployed(
         address dao,
@@ -31,15 +32,16 @@ contract SarcophagusDaoTemplate is BaseTemplate {
      * @param _id String with the name for org, will assign `[id].aragonid.eth`
      * @param _sarcoVotingRights Address of the SARCO Voting Rights contract
      * @param _votingSettings Array of [supportRequired, minAcceptanceQuorum, voteDuration] to set up the voting app of the organization
-     * @param _permissionManager The administrator that's initially granted control over the DAO's permissions
      */
     function newInstance(
         string memory _id,
         MiniMeToken _sarcoVotingRights,
-        uint64[3] memory _votingSettings,
-        address _permissionManager
+        uint64[3] memory _votingSettings
     ) public {
-        require(_sarcoVotingRights != address(0), "Invalid SARCO Voting Rights");
+        require(
+            _sarcoVotingRights != address(0),
+            "Invalid SARCO Voting Rights"
+        );
 
         _validateId(_id);
         _validateVotingSettings(_votingSettings);
@@ -50,12 +52,12 @@ contract SarcophagusDaoTemplate is BaseTemplate {
                 dao,
                 acl,
                 _sarcoVotingRights,
-                _votingSettings,
-                _permissionManager
+                _votingSettings
             );
+        _transferCreatePaymentManagerFromTemplate(acl, finance, voting);
         _transferRootPermissionsFromTemplateAndFinalizeDAO(
             dao,
-            _permissionManager
+            voting
         );
         _registerID(_id, dao);
 
@@ -73,15 +75,22 @@ contract SarcophagusDaoTemplate is BaseTemplate {
         Kernel _dao,
         ACL _acl,
         MiniMeToken _sarcoVotingRights,
-        uint64[3] memory _votingSettings,
-        address _permissionManager
-    ) internal returns (Voting, Agent, Finance) {
+        uint64[3] memory _votingSettings
+    )
+        internal
+        returns (
+            Voting,
+            Agent,
+            Finance
+        )
+    {
         Agent agent = _installDefaultAgentApp(_dao);
+        Finance finance =
+            _installFinanceApp(_dao, agent, DEFAULT_FINANCE_PERIOD);
         Voting voting =
             _installVotingApp(_dao, _sarcoVotingRights, _votingSettings);
-        Finance finance = _installFinanceApp(_dao, agent, 0); // duration 0 uses default (30 days)
 
-        _setupPermissions(_acl, agent, voting, finance, _permissionManager);
+        _setupPermissions(_acl, agent, voting, finance);
 
         return (voting, agent, finance);
     }
@@ -90,30 +99,19 @@ contract SarcophagusDaoTemplate is BaseTemplate {
         ACL _acl,
         Agent _agent,
         Voting _voting,
-        Finance _finance,
-        address _permissionManager
+        Finance _finance
     ) internal {
         _createAgentPermissions(_acl, _agent, _voting, _voting);
-        _createVaultPermissions(
+        _createVaultPermissions(_acl, Vault(_agent), _finance, _voting);
+        _createFinancePermissions(_acl, _finance, _voting, _voting);
+        _createFinanceCreatePaymentsPermission(
             _acl,
-            Vault(_agent),
             _finance,
-            _permissionManager
-        );
-        _createEvmScriptsRegistryPermissions(
-            _acl,
-            _permissionManager,
-            _permissionManager
-        );
-        _createVotingPermissions(
-            _acl,
             _voting,
-            _voting,
-            ANY_ENTITY,
-            _permissionManager
+            address(this)
         );
-        _createFinancePermissions(_acl, _finance, _voting, _permissionManager);
-        _createFinanceCreatePaymentsPermission(_acl, _finance, _voting, _permissionManager);
+        _createEvmScriptsRegistryPermissions(_acl, _voting, _voting);
+        _createVotingPermissions(_acl, _voting, _voting, ANY_ENTITY, _voting);
     }
 
     function _validateVotingSettings(uint64[3] memory _votingSettings)
