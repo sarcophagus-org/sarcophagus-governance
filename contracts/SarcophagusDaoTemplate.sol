@@ -13,7 +13,8 @@ contract SarcophagusDaoTemplate is BaseTemplate {
         address acl,
         address sarcophagusVotingRights,
         address voting,
-        address agent
+        address agent,
+        address finance
     );
 
     constructor(
@@ -44,7 +45,7 @@ contract SarcophagusDaoTemplate is BaseTemplate {
         _validateVotingSettings(_votingSettings);
 
         (Kernel dao, ACL acl) = _createDAO();
-        (Voting voting, Agent agent) =
+        (Voting voting, Agent agent, Finance finance) =
             _setupApps(
                 dao,
                 acl,
@@ -63,7 +64,8 @@ contract SarcophagusDaoTemplate is BaseTemplate {
             address(acl),
             address(_sarcoVotingRights),
             address(voting),
-            address(agent)
+            address(agent),
+            address(finance)
         );
     }
 
@@ -73,27 +75,29 @@ contract SarcophagusDaoTemplate is BaseTemplate {
         MiniMeToken _sarcoVotingRights,
         uint64[3] memory _votingSettings,
         address _permissionManager
-    ) internal returns (Voting, Agent) {
+    ) internal returns (Voting, Agent, Finance) {
         Agent agent = _installDefaultAgentApp(_dao);
         Voting voting =
             _installVotingApp(_dao, _sarcoVotingRights, _votingSettings);
+        Finance finance = _installFinanceApp(_dao, agent, 0); // duration 0 uses default (30 days)
 
-        _setupPermissions(_acl, agent, voting, _permissionManager);
+        _setupPermissions(_acl, agent, voting, finance, _permissionManager);
 
-        return (voting, agent);
+        return (voting, agent, finance);
     }
 
     function _setupPermissions(
         ACL _acl,
         Agent _agent,
         Voting _voting,
+        Finance _finance,
         address _permissionManager
     ) internal {
-        _createAgentPermissions(_acl, _agent, _voting, _permissionManager);
+        _createAgentPermissions(_acl, _agent, _voting, _voting);
         _createVaultPermissions(
             _acl,
             Vault(_agent),
-            _voting,
+            _finance,
             _permissionManager
         );
         _createEvmScriptsRegistryPermissions(
@@ -108,6 +112,8 @@ contract SarcophagusDaoTemplate is BaseTemplate {
             ANY_ENTITY,
             _permissionManager
         );
+        _createFinancePermissions(_acl, _finance, _voting, _permissionManager);
+        _createFinanceCreatePaymentsPermission(_acl, _finance, _voting, _permissionManager);
     }
 
     function _validateVotingSettings(uint64[3] memory _votingSettings)
