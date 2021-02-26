@@ -1,6 +1,6 @@
 module.exports = require("@aragon/os/truffle-config.js");
 
-module.exports.networks.mainnet.gasPrice = 61e9;
+module.exports.networks.mainnet.gasPrice = 150e9;
 
 module.exports.compilers = {
   solc: {
